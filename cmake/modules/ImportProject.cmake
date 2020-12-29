@@ -32,6 +32,17 @@ function(import_git_repository Name Repository)
         if(NOT GitClone_RESULT EQUAL 0)
             message(FATAL_ERROR "Git clone error\n${GitClone_ERROR}")
         endif()
+
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E env ${GIT_EXECUTABLE} submodule update --init --recursive --depth 1
+            WORKING_DIRECTORY ${ImportGitRepository_SOURCE_DIR}
+            RESULT_VARIABLE GitSubmodule_RESULT
+            OUTPUT_VARIABLE GitSubmodule_OUTPUT
+            ERROR_VARIABLE GitSubmodule_ERROR
+        )
+        if(NOT GitSubmodule_RESULT EQUAL 0)
+            message(FATAL_ERROR "Git submodule update error\n${GitSubmodule_ERROR}")
+        endif()
     else()
         if(NOT EXISTS "${ImportGitRepository_SOURCE_DIR}/.git")
             message(FATAL_ERROR

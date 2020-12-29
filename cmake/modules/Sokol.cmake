@@ -5,8 +5,8 @@ include(CMakeParseArguments)
 
 function(import_sokol SourceDir)
     set(options OPENGL)
-    set(one_value_keywords "")
-    set(multi_value_keywords "")
+    set(one_value_keywords LIBRARIES)
+    set(multi_value_keywords IMGUI_TARGET)
     cmake_parse_arguments(ImportSokol
         "${options}" "${one_value_keywords}" "${multi_value_keywords}" ${ARGN})
 
@@ -50,6 +50,40 @@ function(import_sokol SourceDir)
     else()
         message(FATAL_ERROR "Unsupported platform ${CMAKE_SYSTEM_NAME}")
     endif()
+
+    foreach(ImportSokol_LIBRARY IN ITEMS ${ImportSokol_LIBRARIES})
+        if(ImportSokol_LIBRARY STREQUAL imgui)
+            if(NOT DEFINED ImportSokol_IMGUI_TARGET)
+                if(NOT TARGET imgui)
+                    message(FATAL_ERROR "imgui target is not defined")
+                endif()
+                set(ImportSokol_IMGUI_TARGET imgui)
+            endif()
+
+            add_library(sokol_imgui STATIC EXCLUDE_FROM_ALL
+                ${ImportSokol_SOURCE_DIR}/util/sokol_imgui.h
+            )
+            target_link_libraries(sokol_imgui
+                PUBLIC sokol ${ImportSokol_IMGUI_TARGET})
+            target_include_directories(sokol_imgui
+                PUBLIC ${ImportSokol_SOURCE_DIR}/util)
+            set_target_properties(sokol_imgui PROPERTIES
+                ARCHIVE_OUTPUT_DIRECTORY "${ImportSokol_BINARY_DIR}/lib"
+                LIBRARY_OUTPUT_DIRECTORY "${ImportSokol_BINARY_DIR}/lib"
+                RUNTIME_OUTPUT_DIRECTORY "${ImportSokol_BINARY_DIR}/bin"
+            )
+
+            if(ImportSokol_IMGUI_TARGET STREQUAL imgui)
+                target_sources(sokol_imgui PRIVATE ${SokolModule_SOURCES}/sokol_imgui.cpp)
+            elseif(ImportSokol_IMGUI_TARGET STREQUAL cimgui)
+                target_sources(sokol_imgui PRIVATE ${SokolModule_SOURCES}/sokol_imgui.c)
+            else()
+                message(FATAL_ERROR "Unknown ImGui target ${ImportSokol_IMGUI_TARGET}")
+            endif()
+        else()
+            message(FATAL_ERROR "Unsupported sokol library ${ImportSokol_LIBRARY}")
+        endif()
+    endforeach()
 endfunction()
 
 function(import_sokol_tools SourceDir)

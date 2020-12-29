@@ -17,9 +17,12 @@
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
+#include "sokol_time.h"
 #include "HandmadeMath.h"
 #include "stb_image.h"
 #include "shaders/png_image.h"
+#include "cimgui.h"
+#include "sokol_imgui.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -81,12 +84,16 @@ static struct {
     sg_pipeline pipeline;
     sg_pass_action pass_action;
     camera_t camera;
+    uint64_t last_time;
 } state;
 
 static void init(void) {
     sg_setup(&(sg_desc){
         .context = sapp_sgcontext(),
     });
+
+    stm_setup();
+    simgui_setup(&(simgui_desc_t){});
 
     int image_width, image_height, image_components;
     unsigned char* pixels = stbi_load(state.filename, &image_width, &image_height, &image_components, 4);
@@ -157,6 +164,13 @@ static void init(void) {
 static void frame(void) {
     const int width = sapp_width();
     const int height = sapp_height();
+    const float delta_time = stm_sec(stm_laptime(&state.last_time));
+
+    simgui_new_frame(width, height, delta_time);
+
+    igBegin("Information", NULL, 0);
+    igText("Filename: %s", state.filename);
+    igEnd();
 
     camera_update(&state.camera, width, height);
 
@@ -169,11 +183,15 @@ static void frame(void) {
     sg_apply_bindings(&state.bindings);
     sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_params, &vs_params, sizeof(vs_params));
     sg_draw(0, 6, 1);
+    simgui_render();
     sg_end_pass();
     sg_commit();
 }
 
 static void event(const sapp_event* event) {
+    if(simgui_handle_event(event))
+        return;
+
     switch (event->type) {
     case SAPP_EVENTTYPE_MOUSE_SCROLL:
         camera_zoom(&state.camera, event->scroll_y);
@@ -203,6 +221,7 @@ static void event(const sapp_event* event) {
 }
 
 static void cleanup(void) {
+    simgui_shutdown();
     sg_shutdown();
 }
 

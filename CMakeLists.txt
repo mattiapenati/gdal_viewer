@@ -7,9 +7,10 @@ include(ImportProject)
 include(HandmadeMath)
 include(Sokol)
 include(Stb)
+include(ImGui)
 
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
@@ -26,8 +27,11 @@ import_stb(${stb_SOURCE_DIR} LIBRARIES image)
 import_git_repository(hmm https://github.com/HandmadeMath/Handmade-Math.git)
 import_handmademath(${hmm_SOURCE_DIR} ALIAS hmm)
 
+import_git_repository(cimgui https://github.com/cimgui/cimgui.git)
+import_cimgui(${cimgui_SOURCE_DIR})
+
 import_git_repository(sokol https://github.com/floooh/sokol.git)
-import_sokol(${sokol_SOURCE_DIR})
+import_sokol(${sokol_SOURCE_DIR} LIBRARIES imgui IMGUI_TARGET cimgui)
 
 import_git_repository(sokol_tools https://github.com/floooh/sokol-tools-bin.git)
 import_sokol_tools(${sokol_tools_SOURCE_DIR})
@@ -40,4 +44,4 @@ add_executable(imagevw
     ${CMAKE_BINARY_DIR}/shaders/png_image.h
 )
 target_include_directories(imagevw PRIVATE ${CMAKE_BINARY_DIR})
-target_link_libraries(imagevw PRIVATE sokol hmm stb_image)
+target_link_libraries(imagevw PRIVATE sokol sokol_imgui hmm stb_image)
