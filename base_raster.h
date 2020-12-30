@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef GDAL_VIEWER_BASE_RASTER_H
+#define GDAL_VIEWER_BASE_RASTER_H
+
 #include "HandmadeMath.h"
 #include "sokol_gfx.h"
 
@@ -23,13 +26,9 @@ typedef struct {
 
     sg_bindings bindings;
     sg_pipeline pipeline;
-} image_t;
+} _base_raster_t;
 
-void image_init(image_t* image, void* pixels, int width, int height);
-void image_reset(image_t* image);
-void image_destroy(image_t* image);
+void _base_raster_init(void* self, int width, int height, const sg_shader_desc* shader_desc);
 
-void image_zoom(image_t* image, float scroll);
-void image_move(image_t* image, float dx, float dy);
+#endif /* GDAL_VIEWER_BASE_RASTER_H */
 
-void image_draw(image_t* image, int app_width, int app_height);

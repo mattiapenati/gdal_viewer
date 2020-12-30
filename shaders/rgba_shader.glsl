@@ -17,12 +17,12 @@
 @ctype mat4 hmm_mat4
 
 @vs vs
-uniform vs_params {
+layout(binding=0) uniform vs_params {
     mat4 proj;
 };
 
-in vec3 position;
-in vec2 texCoord;
+layout(location=0) in vec3 position;
+layout(location=1) in vec2 texCoord;
 
 out vec2 uv;
 
@@ -33,7 +33,7 @@ void main() {
 @end
 
 @fs fs
-uniform sampler2D tex;
+layout(location=0) uniform sampler2D tex;
 
 in vec2 uv;
 
@@ -44,4 +44,5 @@ void main() {
 }
 @end
 
-@program image vs fs
+@program rgba vs fs
+

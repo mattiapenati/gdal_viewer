@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "image.h"
+#include "raster.h"
 #include "sokol_app.h"
 #include "sokol_gfx.h"
 #include "sokol_glue.h"
@@ -26,7 +26,7 @@
 
 static struct {
     const char* filename;
-    image_t image;
+    void* raster;
     sg_pass_action pass_action;
     uint64_t last_time;
 } state;
@@ -116,7 +116,7 @@ static void init(void) {
 
     int width, height;
     void* pixels = gdal_load(state.filename, &width, &height);
-    image_init(&state.image, pixels, width, height);
+    state.raster = make_rgba_raster(pixels, width, height, SG_PIXELFORMAT_RGBA8);
     free(pixels);
 
     state.pass_action = (sg_pass_action){
@@ -139,7 +139,7 @@ static void frame(void) {
     igEnd();
 
     sg_begin_default_pass(&state.pass_action, width, height);
-    image_draw(&state.image, width, height);
+    raster_draw(state.raster, width, height);
     simgui_render();
     sg_end_pass();
     sg_commit();
@@ -151,7 +151,7 @@ static void event(const sapp_event* event) {
 
     switch (event->type) {
     case SAPP_EVENTTYPE_MOUSE_SCROLL:
-        image_zoom(&state.image, event->scroll_y);
+        raster_zoom(state.raster, event->scroll_y);
         break;
     case SAPP_EVENTTYPE_MOUSE_DOWN:
         if (event->mouse_button == SAPP_MOUSEBUTTON_LEFT)
@@ -163,7 +163,7 @@ static void event(const sapp_event* event) {
         break;
     case SAPP_EVENTTYPE_MOUSE_MOVE:
         if (sapp_mouse_locked())
-            image_move(&state.image, event->mouse_dx, event->mouse_dy);
+            raster_move(state.raster, event->mouse_dx, event->mouse_dy);
         break;
     case SAPP_EVENTTYPE_KEY_DOWN:
         if (event->key_code == SAPP_KEYCODE_ESCAPE)
@@ -171,14 +171,14 @@ static void event(const sapp_event* event) {
         break;
     case SAPP_EVENTTYPE_CHAR:
         if (event->char_code == '0')
-            image_reset(&state.image);
+            raster_reset_view(state.raster);
     default:
         break;
     }
 }
 
 static void cleanup(void) {
-    image_destroy(&state.image);
+    raster_destroy(state.raster);
 
     simgui_shutdown();
     sg_shutdown();

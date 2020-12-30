@@ -35,12 +35,15 @@ import_sokol_tools(${sokol_tools_SOURCE_DIR})
 find_package(GDAL REQUIRED)
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
-sokol_generate_shader(shaders/image_shader.glsl ${CMAKE_BINARY_DIR}/shaders/image_shader.h)
+sokol_generate_shader(shaders/rgba_shader.glsl ${CMAKE_BINARY_DIR}/shaders/rgba_shader.h)
 
-add_executable(imagevw
-    image.h
-    image.c
-    ${CMAKE_BINARY_DIR}/shaders/image_shader.h
+add_executable(imagevw)
+target_sources(imagevw PRIVATE
+    raster.h
+    raster.c
+    base_raster.h
+    rgba_raster.c
+    ${CMAKE_BINARY_DIR}/shaders/rgba_shader.h
     main.c
 )
 target_include_directories(imagevw PRIVATE ${CMAKE_BINARY_DIR})
