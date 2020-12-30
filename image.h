@@ -14,34 +14,22 @@
  * limitations under the License.
  */
 
-@ctype mat4 hmm_mat4
+#include "HandmadeMath.h"
+#include "sokol_gfx.h"
 
-@vs vs
-uniform vs_params {
-    mat4 proj;
-};
+typedef struct {
+    hmm_vec2 center;
+    float zoom;
 
-in vec3 position;
-in vec2 texCoord;
+    sg_bindings bindings;
+    sg_pipeline pipeline;
+} image_t;
 
-out vec2 uv;
+void image_init(image_t* image, void* pixels, int width, int height);
+void image_reset(image_t* image);
+void image_destroy(image_t* image);
 
-void main() {
-    gl_Position = proj * vec4(position, 1.0f);
-    uv = texCoord;
-}
-@end
+void image_zoom(image_t* image, float scroll);
+void image_move(image_t* image, float dx, float dy);
 
-@fs fs
-uniform sampler2D tex;
-
-in vec2 uv;
-
-out vec4 frag_color;
-
-void main() {
-    frag_color = texture(tex, uv);
-}
-@end
-
-@program png_image vs fs
+void image_draw(image_t* image, int app_width, int app_height);

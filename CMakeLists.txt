@@ -37,11 +37,13 @@ import_git_repository(sokol_tools https://github.com/floooh/sokol-tools-bin.git)
 import_sokol_tools(${sokol_tools_SOURCE_DIR})
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/shaders)
-sokol_generate_shader(shaders/png_image.glsl ${CMAKE_BINARY_DIR}/shaders/png_image.h)
+sokol_generate_shader(shaders/image_shader.glsl ${CMAKE_BINARY_DIR}/shaders/image_shader.h)
 
 add_executable(imagevw
+    image.h
+    image.c
+    ${CMAKE_BINARY_DIR}/shaders/image_shader.h
     main.c
-    ${CMAKE_BINARY_DIR}/shaders/png_image.h
 )
 target_include_directories(imagevw PRIVATE ${CMAKE_BINARY_DIR})
 target_link_libraries(imagevw PRIVATE sokol sokol_imgui hmm stb_image)
