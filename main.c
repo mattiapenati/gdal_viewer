@@ -38,7 +38,7 @@ static void init(void) {
     });
 
     stm_setup();
-    simgui_setup(&(simgui_desc_t){});
+    simgui_setup(&(simgui_desc_t){ 0 });
 
     state.raster = make_gdal_raster(state.filename);
     if (state.raster == NULL)

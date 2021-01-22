@@ -4,6 +4,7 @@ function(import_cimgui SourceDir)
     set(ImportCImGui_SOURCE_DIR "${SourceDir}")
     set(ImportCImGui_BINARY_DIR "${CMAKE_BINARY_DIR}/_imported/cimgui")
 
+    set(IMGUI_STATIC ON)
     add_subdirectory(${ImportCImGui_SOURCE_DIR})
     target_compile_definitions(cimgui INTERFACE CIMGUI_DEFINE_ENUMS_AND_STRUCTS)
     set_target_properties(cimgui PROPERTIES
