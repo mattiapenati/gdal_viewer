@@ -43,6 +43,7 @@ target_sources(imagevw PRIVATE
     raster.c
     base_raster.h
     rgba_raster.c
+    gdal_raster.c
     ${CMAKE_BINARY_DIR}/shaders/rgba_shader.h
     main.c
 )

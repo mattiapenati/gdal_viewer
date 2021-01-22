@@ -20,6 +20,7 @@
 #include "sokol_gfx.h"
 
 void* make_rgba_raster(void* pixels, int width, int height, sg_pixel_format pixel_format);
+void* make_gdal_raster(const char* filename);
 
 void raster_destroy(void* self);
 void raster_move(void* self, float dx, float dy);
